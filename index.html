@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Valve Vault Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; overflow-y: hidden; overflow-x: hidden; }
+        /* ===== FLOATING DRAWER PORTAL ===== */
+
+#floatingDrawer{
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    margin-top: -20px;
+    width: 390px;
+    height: 160px;
+    pointer-events: none;
+    z-index: 60;   /* ⬅ di bawah police tape */
+}
+
+#floatingDrawer .drawer-housing{
+    position: absolute;
+    left: 50%;
+    bottom: 60px;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+
+
+
+        
+        /* --- CLOCK --- */
+        .clock-container {
+            width: 100px; height: 100px; background: #ffffff; border-radius: 50%;
+            border: 4px solid #e2e8f0; position: relative; margin: 0 auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 1.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 1s; cursor: pointer; z-index: 85;
+        }
+        .clock-face { position: relative; width: 100%; height: 100%; }
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 10px; }
+        .hour-hand { width: 4px; height: 25%; background: #1e293b; z-index: 3; margin-left: -2px; }
+        .min-hand { width: 3px; height: 35%; background: #64748b; z-index: 2; margin-left: -1.5px; }
+        .sec-hand { width: 1.5px; height: 42%; background: #ef4444; z-index: 4; margin-left: -0.75px; }
+        .clock-center { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #1e293b; border-radius: 50%; transform: translate(-50%, -50%); z-index: 5; border: 2px solid white; }
+        .clock-shifted { transform: translateX(-60px) translateZ(40px); box-shadow: 25px 10px 30px rgba(0,0,0,0.25); }
+
+        /* --- HANGING NAMEPLATE --- */
+        .hanging-wrapper {
+            position: relative; margin-top: 15px; display: flex; flex-direction: column; align-items: center;
+            perspective: 1000px;
+        }
+        .nail { width: 100px; height: 10px; background: #334155; border-radius: 50%; z-index: 20; box-shadow: 0 2px 4px rgba(0,0,0,0.4); width: 10px; }
+        .swing-container {
+            position: relative; transform-origin: top center; 
+            display: flex; flex-direction: column; align-items: center;
+            animation: globalSwing 2s ease-in-out infinite alternate;
+        }
+        .ropes-svg { width: 100px; height: 40px; margin-top: -5px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); }
+        .rope-line { fill: none; stroke: #94a3b8; stroke-width: 2; }
+        .nameplate {
+            background: #475569; color: white; padding: 8px 30px; border-radius: 4px;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.4);
+            border: 2px solid #334155; margin-top: -2px;
+        }
+        @keyframes globalSwing { 0% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
+
+        /* --- CABINET --- */
+        .cabinet-grid { perspective: 1000px; margin-top: 30px; }
+        .info-card {
+            position: relative; background: #cbd5e1; height: 120px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            border: 1px solid #94a3b8; box-shadow: inset 5px 5px 15px rgba(0,0,0,0.2);
+        }
+        .glass-door {
+            position: absolute; top: 0; width: 50%; height: 100%;
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.4); z-index: 20;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+            display: flex; align-items: center;
+        }
+        .glass-left { left: 0; border-right: 1px solid rgba(0,0,0,0.1); justify-content: flex-end; }
+        .glass-right { right: 0; border-left: 1px solid rgba(0,0,0,0.1); justify-content: flex-start; }
+        .glass-handle { width: 4px; height: 30px; background: rgba(0,0,0,0.2); border-radius: 10px; margin: 5px; }
+        .info-card.open .glass-left { transform: translateX(-85%); }
+        .info-card.open .glass-right { transform: translateX(85%); }
+        .account-icon { font-size: 2.5rem; transition: transform 0.3s; z-index: 10; cursor: pointer; }
+
+        /* --- 3D DRAWER --- */
+        .drawer-area { height: 160px; display: flex; align-items: center; justify-content: center; perspective: 1200px; margin-top: auto; position: relative; z-index: 60; }
+        .drawer-housing { width: 280px; height: 80px; background: #080c14; position: relative; transform-style: preserve-3d; box-shadow: inset 0 10px 30px rgba(0,0,0,0.9); border-radius: 4px; }
+        .drawer-body { 
+            position: absolute; inset: 0; background: #1e293b; transform-style: preserve-3d; 
+            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; 
+            z-index: 30; border: 2px solid #475569; display: flex; align-items: center; justify-content: center;
+            border-radius: 4px;
+        }
+        .drawer-body::after { content: ''; position: absolute; width: 60px; height: 8px; background: #94a3b8; border-radius: 10px; top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .drawer-body.open { transform: translateZ(80px) translateY(50px); }
+        .access-btn { 
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.6); 
+            opacity: 0; visibility: hidden; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10;
+            background: #334155; border: 1px solid #475569; color: white; padding: 14px 28px; border-radius: 12px; font-size: 11px; font-weight: 800;
+            letter-spacing: 0.15em; text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 0px #1e293b, 0 15px 30px rgba(0,0,0,0.7);
+        }
+        .btn-led { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 10px #ef4444; }
+        .drawer-body.open ~ .access-btn { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); z-index: 40; }
+
+        /* --- POPUP DOKUMEN --- */
+        #docPopup { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; justify-content: center; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: 0.4s; }
+        #docPopup.active { opacity: 1; pointer-events: auto; }
+        .folder-paper { 
+            width: 100%; max-width: 390px; background: #e2e8f0; height: 520px; 
+            border-radius: 2.5rem 2.5rem 0 0; position: relative; 
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.17, 0.84, 0.44, 1); 
+            padding: 40px 30px; box-shadow: 0 -10px 50px rgba(0,0,0,0.2); 
+        }
+        .folder-stitching { position: absolute; inset: 10px; border: 3.5px dashed rgba(0,0,0,0.12); border-radius: 2.1rem 2.1rem 0 0; pointer-events: none; }
+        #docPopup.active .folder-paper { transform: translateY(0); }
+        .doc-inner-card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #cbd5e1; position: relative; overflow: hidden; z-index: 10; }
+        .doc-inner-card::before { content: ''; position: absolute; inset: 6px; border: 2.5px dashed #e2e8f0; border-radius: 8px; pointer-events: none; }
+
+        /* --- VAULT POPUP --- */
+        #vaultModal { transition: opacity 0.3s ease; }
+        #vaultContainer { transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); background: #ffffff; border-radius: 2rem 2rem 0 0; box-shadow: 0 -20px 50px rgba(0,0,0,0.1); }
+        #vaultModal.active { opacity: 1; pointer-events: auto; }
+        #vaultModal.active #vaultContainer { transform: translateY(0); }
+        .pipe { position: absolute; background: linear-gradient(to bottom, #94a3b8, #cbd5e1, #64748b); border-radius: 2px; }
+        .pipe-v { width: 8px; height: 120px; }
+        .pipe-h { height: 8px; width: 40px; }
+        .pipe-joint { width: 14px; height: 14px; background: #475569; border-radius: 50%; border: 2px solid #94a3b8; }
+        .valve-container { width: 65px; height: 65px; perspective: 1000px; cursor: pointer; z-index: 100; }
+        .valve-wheel { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 1s; }
+        .valve-ring { width: 100%; height: 100%; border: 10px solid #b30000; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .valve-spoke { position: absolute; width: 4px; height: 100%; background: #8b0000; }
+        .spoke-2 { transform: rotate(90deg); }
+        .valve-center { width: 18px; height: 18px; background: #334155; border-radius: 50%; z-index: 10; border: 2px solid #64748b; }
+
+        /* --- WALLET POCKET --- */
+        .wallet-pocket { position: absolute; bottom: -110px; left: -10%; width: 120%; height: 280px; background: #ffffff; z-index: 50; border-radius: 4rem 4rem 0 0; box-shadow: 0 -15px 40px rgba(0,0,0,0.08); border-top: 1px solid #f1f5f9; }
+        .wallet-stitching { 
+            position: absolute; top: 12px; left: 10px; right: 10px; height: 240px; 
+            border-top: 4.5px dashed #e2e8f0; border-left: 4.5px dashed #e2e8f0; 
+            border-right: 4.5px dashed #e2e8f0; border-radius: 3.6rem 3.6rem 0 0; 
+            pointer-events: none; 
+        }
+
+        .card-item {
+        --pullY: 0px;
+        --activeY: 0px;
+        --scale: 1;
+
+        transform: translateY(calc(var(--pullY) + var(--activeY))) scale(var(--scale));
+        transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        /* roda ditarik */
+        .pulled-cards .card-item:nth-child(1){ --pullY: -200px; }
+        .pulled-cards .card-item:nth-child(2){ --pullY: -150px; }
+        .pulled-cards .card-item:nth-child(3){ --pullY: -100px; }
+        .pulled-cards .card-item:nth-child(4){ --pullY: -50px; }
+
+        /* kartu diklik */
+        .card-active {
+        --activeY: -80px;
+        --scale: 1.05;
+        z-index: 100;
+        }
+
+        
+
+
+        .neon-bni { background: linear-gradient(135deg, #005e6a, #00a0b0); }
+        .neon-seabank { background: linear-gradient(135deg, #ff5e1f, #ff8c52); }
+        .neon-gopay { background: linear-gradient(135deg, #00aa13, #00d21e); }
+        .neon-dana { background: linear-gradient(135deg, #108ee9, #50b5ff); }
+
+        /* --- EMERGENCY ELEMENTS --- */
+        .emergency-panel {
+            position: absolute; 
+            /* MODIFIKASI: Dinaikkan menjadi 42% supaya 100% tertutup jam */
+            top: 37.5%; 
+            left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; 
+            background: #1e293b; border-radius: 12px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 1; z-index: 70;
+            border: 2px solid #334155;
+        }
+        
+        .panic-btn {
+            width: 38px; height: 38px;
+            background: #ef4444; border-radius: 50%;
+            border: none; cursor: pointer; position: relative;
+            box-shadow: 0 4px 0 #b91c1c, 0 8px 15px rgba(0,0,0,0.4);
+            transition: 0.1s; display: flex; align-items: center; justify-content: center; 
+            color: #7f1d1d; font-size: 16px;
+        }
+        .panic-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b91c1c, 0 3px 5px rgba(0,0,0,0.4); }
+
+        .siren-unit {
+            position: absolute; top: 10px; right: 10px;
+            width: 60px; height: 60px; z-index: 90; pointer-events: none;
+            opacity: 0; 
+            transition: opacity 0.5s ease;
+        }
+        .siren-unit.active { opacity: 1; }
+
+        .siren-frame {
+            width: 100%; height: 100%; background: #334155;
+            border: 3px solid #1e293b; border-radius: 50%; position: relative;
+            overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .siren-bulb {
+            position: absolute; inset: 2px; border-radius: 50%;
+            background: radial-gradient(circle, #ff0000 20%, #7f1d1d 80%);
+            overflow: hidden;
+        }
+        .siren-bulb::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 255, 255, 0.8) 40deg, transparent 80deg);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .siren-glare {
+            position: absolute; top: 50%; left: 50%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(239,68,68,0.6) 0%, rgba(239,68,68,0) 70%);
+            transform: translate(-50%, -50%); opacity: 0; z-index: -1;
+        }
+
+        .siren-on .siren-bulb { background: #ef4444; box-shadow: 0 0 30px #ef4444; }
+        .siren-on .siren-bulb::after { animation: rotateSiren 0.6s linear infinite; opacity: 1; }
+        .siren-on .siren-glare { animation: sirenPulse 0.3s ease-in-out infinite alternate; opacity: 1; }
+        
+        @keyframes rotateSiren { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes sirenPulse { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0.3; } to { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; } }
+
+
+        /* BOMB & EFFECTS */
+        .bomb-box {
+            position: fixed; top: -300px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 180px; z-index: 1000; pointer-events: none;
+        }
+        .bomb-sphere {
+            width: 110px; height: 110px; background: radial-gradient(circle at 30% 30%, #475569, #020617);
+            border-radius: 50%; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+        .bomb-wick {
+            position: absolute; top: -40px; left: 50%; width: 6px; height: 50px;
+            background: #78350f; border-radius: 4px; transform: translateX(-50%);
+            transform-origin: bottom center;
+        }
+        .bomb-fire {
+            position: absolute; top: -55px; left: 50%; width: 25px; height: 25px;
+            background: #fbbf24; border-radius: 50%; transform: translateX(-50%);
+            box-shadow: 0 0 25px #f59e0b, 0 0 50px #ef4444;
+            animation: fireWobble 0.1s infinite alternate;
+            z-index: 2;
+        }
+        @keyframes fireWobble { from { transform: translateX(-50%) scale(0.9); opacity: 0.8; } to { transform: translateX(-50%) scale(1.2); opacity: 1; } }
+
+        .drawer-body.explode {
+            background: radial-gradient(circle at 30% 30%, #ffd166, #f97316, #7f1d1d);
+            box-shadow:
+                0 0 50px rgba(255,120,0,0.9),
+                inset 0 0 40px rgba(120,20,0,0.8);
+            animation: heatFlash 0.12s infinite alternate;
+        }
+
+        @keyframes heatFlash {
+            from { filter: brightness(1) saturate(1); }
+            to   { filter: brightness(1.6) saturate(1.8); }
+        }
+
+
+        .bomb-box.burning .bomb-wick {
+            animation: burnWickBody 2s linear forwards;
+        }
+        .bomb-box.burning .bomb-fire {
+            animation: burnWickFire 2s linear forwards; 
+        }
+
+        @keyframes burnWickBody {
+            0% { height: 50px; top: -40px; }
+            100% { height: 0px; top: 10px; }
+        }
+        @keyframes burnWickFire {
+            0% { top: -55px; } 
+            100% { top: 0px; transform: translateX(-50%) scale(1.5); }
+        }
+
+        .white-out { position: fixed; inset: 0; background: white; z-index: 2000; opacity: 0; pointer-events: none; }
+        .screen-shake { animation: bigShake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes bigShake { 10%, 90% { transform: translate3d(-4px, 0, 0); } 20%, 80% { transform: translate3d(8px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-12px, 0, 0); } 40%, 60% { transform: translate3d(12px, 0, 0); } }
+
+        .glass-crack {
+            position: absolute; inset: 0; z-index: 50; pointer-events: none; opacity: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/glass-shattered.png');
+            background-size: cover;
+        }
+        .damaged .glass-crack { opacity: 0.7; }
+
+        .police-tape{
+    position: fixed;   /* ⬅ BUKAN absolute */
+    background: #fbbf24;
+    color: black;
+    font-weight: 900;
+    font-size: 14px;
+    padding: 10px 0;
+    width: 200%;
+    z-index: 900;      /* di atas drawer (160), di bawah bomb (1000) */
+    border-top: 3px solid black;
+    border-bottom: 3px solid black;
+    display: none;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+        .tape-text { animation: tapeMove 15s linear infinite; display: inline-block; padding-left: 100%; }
+        @keyframes tapeMove { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+        #inputBlocker {
+            position: fixed; inset: 0; z-index: 3000; display: none; cursor: not-allowed;
+        }
+
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-4">
+
+    <div id="inputBlocker"></div>
+
+    <div id="mainVault" class="w-full max-w-[390px] h-[840px] bg-white rounded-[3.5rem] shadow-2xl border border-slate-100 relative flex flex-col overflow-hidden">
+        
+        <div id="siren" class="siren-unit">
+            <div class="siren-frame">
+                <div class="siren-bulb"></div>
+            </div>
+            <div class="siren-glare"></div>
+        </div>
+
+        <div class="pt-10 pb-2 text-center relative">
+            
+            <div id="emergencyPanel" class="emergency-panel">
+                <button id="panicButton" class="panic-btn">
+                    <i class="fa-solid fa-skull"></i>
+                </button>
+            </div>
+
+            <div class="clock-container" id="mainClock">
+                <div class="clock-face">
+                    <div class="hand hour-hand" id="hour"></div>
+                    <div class="hand min-hand" id="min"></div>
+                    <div class="hand sec-hand" id="sec"></div>
+                    <div class="clock-center"></div>
+                </div>
+            </div>
+
+            <div class="hanging-wrapper">
+                <div class="nail"></div>
+                <div class="swing-container">
+                    <svg class="ropes-svg" viewBox="0 0 100 40"><path class="rope-line" d="M50,0 L25,40" /><path class="rope-line" d="M50,0 L75,40" /></svg>
+                    <div class="nameplate">RIZKY NUR RAMADHAN</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cabinetGrid" class="px-6 grid grid-cols-2 gap-3 mb-4 cabinet-grid">
+            <div class="info-card">
+                <div class="glass-crack"></div>
+                <div class="glass-door glass-left" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <div class="glass-door glass-right" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <i class="fab fa-whatsapp account-icon text-green-500" data-link="https://wa.me/628895407738" onclick="showDoc('WhatsApp', '@rinura_', 'fa-whatsapp text-green-500', this)"></i>
+            </div>
+            <div class="info-card">
+                <div class="glass-crack"></div>
+                <div class="glass-door glass-left" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <div class="glass-door glass-right" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <i class="fab fa-instagram account-icon text-pink-500" data-link="https://instagram.com/zky_nra" onclick="showDoc('Instagram', '@zky_nra', 'fa-instagram text-pink-500', this)"></i>
+            </div>
+            <div class="info-card">
+                <div class="glass-crack"></div>
+                <div class="glass-door glass-left" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <div class="glass-door glass-right" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <i class="fab fa-tiktok account-icon text-slate-900" data-link="https://tiktok.com/@zkyyran" onclick="showDoc('TikTok', '@zkyyran', 'fa-tiktok text-slate-900', this)"></i>
+            </div>
+            <div class="info-card">
+                <div class="glass-crack"></div>
+                <div class="glass-door glass-left" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <div class="glass-door glass-right" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <i class="fab fa-facebook account-icon text-blue-700" data-link="https://facebook.com/zkyy.ran" onclick="showDoc('Facebook', '@zkyy.ran', 'fa-facebook text-blue-700', this)"></i>
+            </div>
+            <div class="info-card">
+                <div class="glass-crack"></div>
+                <div class="glass-door glass-left" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <div class="glass-door glass-right" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <i class="fab fa-discord account-icon text-indigo-500" data-link="https://discord.gg/qBy95z3a" onclick="showDoc('Discord', 'zkayy_q', 'fa-discord text-indigo-500', this)"></i>
+            </div>
+            <div class="info-card">
+                <div class="glass-crack"></div>
+                <div class="glass-door glass-left" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <div class="glass-door glass-right" onclick="toggleGlass(this)"><div class="glass-handle"></div></div>
+                <i class="fab fa-youtube account-icon text-red-600" data-link="https://youtube.com/@zkyNurra" onclick="showDoc('YouTube', '@zkyNurra', 'fa-youtube text-red-600', this)"></i>
+            </div>
+        </div>
+
+        
+        </div>
+
+    </div>
+
+
+
+    <!-- ===== FLOATING DRAWER LAYER ===== -->
+    <div id="floatingDrawer" class="drawer-area">
+        <div class="drawer-housing">
+            <div class="drawer-body" onclick="this.classList.toggle('open')"></div>
+            <button onclick="toggleVault()" class="access-btn">
+                <div class="btn-led"></div><span>Access Vault</span>
+            </button>
+        </div>
+    </div>
+
+
+    <div id="docPopup" onclick="closeDoc()">
+        <div class="folder-paper" onclick="event.stopPropagation()">
+            <div class="folder-stitching"></div>
+            <div class="flex justify-between items-start mb-8 relative z-10">
+                <div>
+                    <h2 id="docTitle" class="text-3xl font-black text-slate-800 uppercase leading-none">Account</h2>
+                    <p class="text-[10px] font-bold text-slate-500 mt-2 tracking-widest uppercase">Classified Information</p>
+                </div>
+                <div class="px-3 py-1 bg-red-600 text-white text-[10px] font-bold rounded shadow-lg transform rotate-3">TOP SECRET</div>
+            </div>
+            <div class="doc-inner-card">
+                <div class="flex items-center gap-4 mb-6 relative z-10">
+                    <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-3xl">
+                        <i id="docIcon" class="fab"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Status</p>
+                        <p class="text-green-600 font-bold text-sm uppercase">Verified Active</p>
+                    </div>
+                </div>
+                <p id="docUser" class="text-2xl font-black text-slate-700 mb-8 tracking-tight">@username</p>
+                <a id="docLink" href="#" target="_blank"
+                    class="block text-center w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-xl">
+                    Buka Tautan
+                </a>
+
+            </div>
+            <button onclick="closeDoc()" class="mt-10 w-full text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em]">Tutup Berkas Dokumen</button>
+        </div>
+    </div>
+
+    <div id="vaultModal" class="opacity-0 pointer-events-none fixed inset-0 z-[100] flex items-end justify-center bg-black/40 backdrop-blur-md" onclick="toggleVault()">
+        <div id="vaultContainer" class="w-full max-w-[390px] p-8 relative h-[680px] overflow-hidden" onclick="event.stopPropagation()">
+            <div class="absolute right-12 top-0 pipe pipe-v opacity-40"></div>
+            <div class="absolute right-[44px] top-[110px] pipe pipe-h opacity-40"></div>
+            <div class="absolute right-[38px] top-[107px] pipe-joint opacity-60"></div>
+            <div class="absolute right-6 top-32 z-[95] valve-container" onclick="pullLever()">
+                <div id="valveWheel" class="valve-wheel"><div class="valve-ring"><div class="valve-spoke"></div><div class="valve-spoke spoke-2"></div><div class="valve-center"></div></div></div>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 mb-8">My Cards</h3>
+            <div class="relative h-[440px] mt-4">
+                <div onclick="toggleCard(this)" class="card-item neon-bni absolute bottom-0 w-full h-48 rounded-[2rem] p-6 text-white" style="z-index:10; bottom: 0px;"><span class="font-bold text-sm">BNI</span><div class="mt-12 opacity-0 content"><p class="text-lg font-bold">2022 543 721</p></div></div>
+                <div onclick="toggleCard(this)" class="card-item neon-seabank absolute bottom-0 w-full h-48 rounded-[2rem] p-6 text-white" style="z-index:20; bottom: 0px;"><span class="font-bold text-sm">SeaBank</span><div class="mt-12 opacity-0 content"><p class="text-lg font-bold">9014 3352 2658</p></div></div>
+                <div onclick="toggleCard(this)" class="card-item neon-gopay absolute bottom-0 w-full h-48 rounded-[2rem] p-6 text-white" style="z-index:30; bottom: 0px;"><span class="font-bold text-sm">GOPAY</span><div class="mt-12 opacity-0 content"><p class="text-lg font-bold">0889 5407 738</p></div></div>
+                <div onclick="toggleCard(this)" class="card-item neon-dana absolute bottom-0 w-full h-48 rounded-[2rem] p-6 text-white" style="z-index:40; bottom: 0px;"><span class="font-bold text-sm">DANA</span><div class="mt-12 opacity-0 content"><p class="text-lg font-bold">0889 5407 738</p></div></div>
+                <div class="wallet-pocket pt-8 flex flex-col items-center">
+                    <div class="wallet-stitching"></div>
+                    <div class="px-4 py-1.5 bg-slate-900 rounded-full mb-6 z-10 relative">
+                        <p class="text-[8px] font-black text-white tracking-[0.4em] uppercase">Digital Vault</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bomb" class="bomb-box">
+        <div class="bomb-wick"><div class="bomb-fire"></div></div>
+        <div class="bomb-sphere"></div>
+    </div>
+
+    <div id="whiteOut" class="white-out"></div>
+
+    <div class="police-tape" style="top:15%; left:-20%; transform: rotate(15deg);">
+            <div class="tape-text">CRITICAL FAILURE - SYSTEM COMPROMISED - DO NOT CROSS - CRITICAL FAILURE - SYSTEM COMPROMISED - DO NOT CROSS - </div>
+        </div>
+        <div class="police-tape" style="top:40%; left:-30%; transform: rotate(-10deg);">
+            <div class="tape-text">POLICE LINE - DO NOT CROSS - INVESTIGATION IN PROGRESS - POLICE LINE - DO NOT CROSS - </div>
+        </div>
+        <div class="police-tape" style="top:60%; left:-10%; transform: rotate(5deg); background: #facc15;">
+            <div class="tape-text">DANGER - HIGH VOLTAGE - AREA SECURED - DANGER - HIGH VOLTAGE - AREA SECURED - </div>
+        </div>
+        <div class="police-tape" style="bottom:15%; left:-40%; transform: rotate(-20deg);">
+            <div class="tape-text">SYSTEM OFFLINE - ACCESS DENIED - SYSTEM OFFLINE - ACCESS DENIED - SYSTEM OFFLINE - </div>
+        </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const s = now.getSeconds() * 6, m = now.getMinutes() * 6, h = (now.getHours() % 12) * 30 + (now.getMinutes()/2);
+            document.getElementById('sec').style.transform = `rotate(${s}deg)`;
+            document.getElementById('min').style.transform = `rotate(${m}deg)`;
+            document.getElementById('hour').style.transform = `rotate(${h}deg)`;
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function toggleGlass(el) { el.parentElement.classList.toggle('open'); }
+        function showDoc(title, user, iconClass, el) {
+            if(!el.closest('.info-card').classList.contains('open')) return;
+
+            document.getElementById('docTitle').innerText = title;
+            document.getElementById('docUser').innerText = user;
+            document.getElementById('docIcon').className = 'fab ' + iconClass;
+
+            // 🔥 INI YANG KURANG
+            document.getElementById('docLink').href = el.dataset.link;
+
+            document.getElementById('docPopup').classList.add('active');
+        }
+
+        function closeDoc() { document.getElementById('docPopup').classList.remove('active'); }
+        function toggleVault() { document.getElementById('vaultModal').classList.toggle('active'); }
+        function pullLever() {
+            const v = document.getElementById('valveWheel');
+            v.style.transform = v.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
+            document.getElementById('vaultContainer').classList.toggle('pulled-cards');
+        }
+        function toggleCard(el) {
+            const isActive = el.classList.contains('card-active');
+            document.querySelectorAll('.card-item').forEach(c => {
+                c.classList.remove('card-active');
+                if(c.querySelector('.content')) c.querySelector('.content').style.opacity = "0";
+            });
+            if (!isActive) {
+                el.classList.add('card-active');
+                setTimeout(() => { if(el.querySelector('.content')) el.querySelector('.content').style.opacity = "1" }, 200);
+            }
+        }
+
+        const clockBtn = document.getElementById('mainClock');
+        const panicBtn = document.getElementById('panicButton');
+
+        clockBtn.addEventListener('click', () => {
+            clockBtn.classList.toggle('clock-shifted');
+        });
+
+        // REVISED PANIC LOGIC WITH BOUNCE
+        panicBtn.addEventListener('click', () => {
+            const siren = document.getElementById('siren');
+            siren.classList.add('active'); 
+            siren.classList.add('siren-on');
+
+            const bomb = document.getElementById('bomb');
+
+            
+            
+            // Animasi Jatuh & Memantul (Bounce)
+            // Menggunakan array keyframes untuk kontrol penuh posisi
+            const dropKeyframes = [
+                { top: '-300px', offset: 0, easing: 'cubic-bezier(0.8, 0, 1, 1)' }, // Jatuh cepat
+                { top: '420px', transform: 'translateX(-50%) rotate(10deg) scaleY(0.9)', offset: 0.4, easing: 'cubic-bezier(0, 0, 0.2, 1)' }, // Hantam tanah & penyet dikit
+                { top: '320px', transform: 'translateX(-50%) rotate(15deg) scaleY(1.05)', offset: 0.65, easing: 'cubic-bezier(0.8, 0, 1, 1)' }, // Mantul ke atas
+                { top: '420px', transform: 'translateX(-50%) rotate(20deg) scaleY(0.95)', offset: 0.85, easing: 'cubic-bezier(0, 0, 0.2, 1)' }, // Hantam tanah lagi
+                { top: '420px', transform: 'translateX(-50%) rotate(20deg)', offset: 1 } // Diam
+            ];
+
+            const dropAnimation = bomb.animate(dropKeyframes, { duration: 1200, fill: 'forwards' });
+
+            dropAnimation.onfinish = () => {
+                setTimeout(() => {
+                    bomb.classList.add('burning');
+                    setTimeout(triggerExplosion, 2000); 
+                }, 100);
+            };
+        });
+
+        function triggerExplosion() {
+            const whiteOut = document.getElementById('whiteOut');
+            const mainVault = document.getElementById('mainVault');
+            const blocker = document.getElementById('inputBlocker');
+
+            whiteOut.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], { duration: 600 });
+            document.body.classList.add('screen-shake');
+            document.getElementById('bomb').style.display = 'none';
+
+            setTimeout(() => {
+                document.body.classList.remove('screen-shake');
+                document.getElementById('cabinetGrid').classList.add('damaged');
+                document.querySelectorAll('.police-tape').forEach(tape => tape.style.display = 'block');
+                blocker.style.display = 'block'; 
+
+                // efek ke vault
+                mainVault.style.filter = 'grayscale(0.6) sepia(0.4) contrast(1.1)';
+
+                // ✅ efek ke semua laci
+                document.querySelectorAll('.drawer-body').forEach(d => {
+                    d.style.filter = 'grayscale(0.6) sepia(0.5) contrast(1.15) brightness(1.05)';
+                });
+
+            }, 300);
+        }
+
+    
+
+    </script>
+</body>
+</html>
