@@ -8,27 +8,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; overflow-y: hidden; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
         /* ===== FLOATING DRAWER PORTAL ===== */
-
-#floatingDrawer{
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    margin-top: -20px;
-    width: 390px;
+.drawer-area {
+    width: 100%;
     height: 160px;
-    pointer-events: none;
-    z-index: 60;   /* ⬅ di bawah police tape */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+    position: relative; /* Berubah dari fixed agar menyatu dengan konten */
+    z-index: 60;
+    margin-top: auto;   /* Dorong ke posisi bawah otomatis */
+    padding-bottom: 20px;
+    pointer-events: auto; /* WAJIB: Agar tombol dan laci bisa diklik */
 }
 
-#floatingDrawer .drawer-housing{
-    position: absolute;
-    left: 50%;
-    bottom: 60px;
-    transform: translateX(-50%);
-    pointer-events: auto;
+/* Biarkan drawer-housing tetap sesuai desain Anda */
+.drawer-housing {
+    width: 280px;
+    height: 80px;
+    background: #080c14;
+    position: relative;
+    transform-style: preserve-3d;
+    box-shadow: inset 0 10px 30px rgba(0,0,0,0.9);
+    border-radius: 4px;
 }
 
 
@@ -414,22 +418,21 @@
             </div>
         </div>
 
-        
+        <!-- ===== FLOATING DRAWER LAYER ===== -->
+        <div class="drawer-area">
+            <div class="drawer-housing">
+                <div class="drawer-body" onclick="this.classList.toggle('open')"></div>
+                <button onclick="toggleVault()" class="access-btn">
+                    <div class="btn-led"></div><span>Access Vault</span>
+                </button>
+            </div>
         </div>
 
     </div>
 
 
 
-    <!-- ===== FLOATING DRAWER LAYER ===== -->
-    <div id="floatingDrawer" class="drawer-area">
-        <div class="drawer-housing">
-            <div class="drawer-body" onclick="this.classList.toggle('open')"></div>
-            <button onclick="toggleVault()" class="access-btn">
-                <div class="btn-led"></div><span>Access Vault</span>
-            </button>
-        </div>
-    </div>
+    
 
 
     <div id="docPopup" onclick="closeDoc()">
