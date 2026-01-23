@@ -10,34 +10,79 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
         /* ===== FLOATING DRAWER PORTAL ===== */
-.drawer-area {
-    width: 100%;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1200px;
-    position: relative; /* Berubah dari fixed agar menyatu dengan konten */
-    z-index: 60;
-    margin-top: auto;   /* Dorong ke posisi bawah otomatis */
-    padding-bottom: 20px;
-    pointer-events: auto; /* WAJIB: Agar tombol dan laci bisa diklik */
-}
 
-/* Biarkan drawer-housing tetap sesuai desain Anda */
-.drawer-housing {
-    width: 280px;
-    height: 80px;
-    background: #080c14;
-    position: relative;
-    transform-style: preserve-3d;
-    box-shadow: inset 0 10px 30px rgba(0,0,0,0.9);
-    border-radius: 4px;
-}
+        /* --- HANGING LAMP & PULL CORD --- */
+        /* --- AMBIENT OVERLAY (Efek Gelap) --- */
+        #ambientDarkness {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85); /* Kegelapan saat lampu mati */
+            z-index: 200; /* Di bawah UI utama tapi di atas background */
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            opacity: 0; /* Default 0 karena lampu defaultnya HIDUP */
+        }
 
+        /* --- HANGING LAMP & PULL CORD 3D --- */
+        .upper-right-gear {
+            position: fixed;
+            top: 0;
+            right: 27px;
+            z-index: 1000; /* Di atas segalanya agar bisa ditarik */
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
 
+        /* Lampu 3D */
+        .lamp-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-style: preserve-3d;
+        }
+        .lamp-wire { width: 3px; height: 50px; background: #1e293b; }
+        .lamp-shade {
+            width: 60px; height: 35px; background: #334155;
+            border-radius: 50% 50% 10px 10px; position: relative;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .bulb {
+            width: 24px; height: 30px; background: #fef08a; /* Default warna hidup */
+            border-radius: 50% 50% 40% 40%; margin-top: -8px;
+            transition: 0.3s;
+            box-shadow: 0 0 50px #facc15, 0 50px 150px 30px rgba(253, 224, 71, 0.3);
+        }
 
-        
+        /* Tali Tarikan Terpisah */
+        .cord-unit { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .cord-wire { 
+            width: 2px; height: 150px; background: #94a3b8; 
+            position: relative; transition: height 0.1s; transform-origin: top;
+        }
+        .cord-handle {
+            width: 12px; height: 25px; background: linear-gradient(to bottom, #475569, #1e293b);
+            border-radius: 6px; margin-top: -2px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Keadaan Lampu MATI */
+        .is-off .bulb { background: #475569; box-shadow: none; }
+        .is-off ~ #ambientDarkness { opacity: 1; }
+
+        /* Animasi Ganti ke Sirine */
+        .gear-up { transform: translateY(-300px); }
+        /* Biarkan drawer-housing tetap sesuai desain Anda */
+        .drawer-housing {
+            width: 280px;
+            height: 80px;
+            background: #080c14;
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow: inset 0 10px 30px rgba(0,0,0,0.9);
+            border-radius: 4px;
+        }
+
         /* --- CLOCK --- */
         .clock-container {
             width: 100px; height: 100px; background: #ffffff; border-radius: 50%;
@@ -359,6 +404,24 @@
                 </button>
             </div>
 
+            <div id="lampControl" class="upper-right-gear">
+                <div class="lamp-unit" id="mainLamp">
+                    <div class="lamp-wire"></div>
+                    <div class="lamp-shade"></div>
+                    <div class="bulb"></div>
+                </div>
+                
+                <div class="cord-unit" onclick="toggleLight()">
+                    <div class="cord-wire" id="cordWire">
+                        <div style="position:absolute; bottom:0; left:50%; transform:translateX(-50%);">
+                            <div class="cord-handle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ambientDarkness"></div>
+
             <div class="clock-container" id="mainClock">
                 <div class="clock-face">
                     <div class="hand hour-hand" id="hour"></div>
@@ -607,6 +670,84 @@
 
             }, 300);
         }
+
+// Status awal: Lampu HIDUP
+// Status awal: Lampu HIDUP
+let lampIsOn = true;
+
+function toggleLight() {
+    const lampControl = document.getElementById('lampControl');
+    const cord = document.getElementById('cordWire');
+    
+    // Animasi tarik tali (visual feedback)
+    cord.style.height = '170px';
+    setTimeout(() => cord.style.height = '150px', 100);
+
+    // Toggle status
+    lampIsOn = !lampIsOn;
+    updateLampUI();
+}
+
+// Fungsi helper untuk sinkronisasi UI Lampu & Kegelapan
+function updateLampUI() {
+    const lampControl = document.getElementById('lampControl');
+    if (!lampIsOn) {
+        lampControl.classList.add('is-off');
+    } else {
+        lampControl.classList.remove('is-off');
+    }
+}
+
+// LOGIKA DARURAT (PANIC)
+panicBtn.addEventListener('click', () => {
+    // FORCE ON: Jika lampu sedang mati, nyalakan paksa sebelum naik
+    if (!lampIsOn) {
+        lampIsOn = true;
+        updateLampUI();
+    }
+
+    // Beri jeda sangat singkat agar mata melihat lampu "nyala" dulu baru naik
+    setTimeout(() => {
+        // 1. Lampu & Tali naik ke atas
+        document.getElementById('lampControl').classList.add('gear-up');
+        
+        // 2. Sirine muncul bergantian
+        const siren = document.getElementById('siren');
+        siren.classList.add('active', 'siren-on');
+        siren.style.opacity = '1';
+        siren.style.top = '20px'; 
+    }, 150);
+});
+
+// Reset otomatis 10 detik setelah ledakan (lanjutan fungsi triggerExplosion)
+// Pastikan saat reset, lampu turun dalam keadaan menyala (default)
+
+// Modifikasi fungsi triggerExplosion yang kamu kirim sebelumnya
+const originalExplosion = triggerExplosion;
+triggerExplosion = function() {
+    originalExplosion(); // Jalankan fungsi asli
+
+    // RESET OTOMATIS 10 DETIK SETELAH MELEDAK
+    setTimeout(() => {
+        // Balikkan Gear Lampu
+        document.getElementById('lampControl').classList.remove('gear-up');
+        
+        // Sembunyikan Sirine
+        const siren = document.getElementById('siren');
+        siren.classList.remove('active', 'siren-on');
+        siren.style.top = '-200px';
+
+        // Reset Kerusakan (Opsional, sesuai perintah kembali ke semula)
+        document.getElementById('cabinetGrid').classList.remove('damaged');
+        document.getElementById('inputBlocker').style.display = 'none';
+        document.querySelectorAll('.police-tape').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.drawer-body').forEach(d => d.style.filter = 'none');
+        document.getElementById('mainVault').style.filter = 'none';
+        document.getElementById('bomb').style.display = 'none'; 
+        
+        console.log("System Restored.");
+    }, 10000);
+};
     </script>
 </body>
 </html>
