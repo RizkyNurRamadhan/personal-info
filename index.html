@@ -20,14 +20,14 @@
     position: relative; /* Berubah dari fixed agar menyatu dengan konten */
     z-index: 60;
     margin-top: auto;   /* Dorong ke posisi bawah otomatis */
-    padding-bottom: 90px;
+    padding-bottom: 20px;
     pointer-events: auto; /* WAJIB: Agar tombol dan laci bisa diklik */
 }
 
 /* Biarkan drawer-housing tetap sesuai desain Anda */
 .drawer-housing {
-    width: 325px;
-    height: 75px;
+    width: 280px;
+    height: 80px;
     background: #080c14;
     position: relative;
     transform-style: preserve-3d;
@@ -79,14 +79,14 @@
         .info-card {
             position: relative; background: #cbd5e1; height: 120px;
             overflow: hidden; display: flex; align-items: center; justify-content: center;
-            border: 1px solid #94a3b8; box-shadow: inset 5px 5px 15px rgba(0,0,0,0.2);
+            border: 1px solid #94a3b8; box-shadow: inset 5px 5px 15px rgba(0,0,0,0.2); border-radius: 4px;
         }
         .glass-door {
             position: absolute; top: 0; width: 50%; height: 100%;
             background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.4); z-index: 20;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
-            display: flex; align-items: center;
+            display: flex; align-items: center;  
         }
         .glass-left { left: 0; border-right: 1px solid rgba(0,0,0,0.1); justify-content: flex-end; }
         .glass-right { right: 0; border-left: 1px solid rgba(0,0,0,0.1); justify-content: flex-start; }
@@ -96,8 +96,8 @@
         .account-icon { font-size: 2.5rem; transition: transform 0.3s; z-index: 10; cursor: pointer; }
 
         /* --- 3D DRAWER --- */
-        .drawer-area { height: 160px; display: flex; align-items: center; justify-content: center; perspective: 1200px; margin-top: auto; position: relative; z-index: 60; }
-        .drawer-housing { width: 325px; height: 75px; background: #080c14; position: relative; transform-style: preserve-3d; box-shadow: inset 0 10px 30px rgba(0,0,0,0.9); border-radius: 4px; }
+        .drawer-area { height: 160px; display: flex; align-items: center; justify-content: center; perspective: 1200px; margin-top: auto; position: relative; z-index: 60; padding-bottom: 58px; }
+        .drawer-housing { width: 280px; height: 80px; background: #080c14; position: relative; transform-style: preserve-3d; box-shadow: inset 0 10px 30px rgba(0,0,0,0.9); border-radius: 4px; }
         .drawer-body { 
             position: absolute; inset: 0; background: #1e293b; transform-style: preserve-3d; 
             transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; 
@@ -177,9 +177,7 @@
         z-index: 100;
         }
 
-        
-
-
+        /* WARNA KARTU */
         .neon-bni { background: linear-gradient(135deg, #005e6a, #00a0b0); }
         .neon-seabank { background: linear-gradient(135deg, #ff5e1f, #ff8c52); }
         .neon-gopay { background: linear-gradient(135deg, #00aa13, #00d21e); }
@@ -429,12 +427,6 @@
         </div>
 
     </div>
-
-
-
-    
-
-
     <div id="docPopup" onclick="closeDoc()">
         <div class="folder-paper" onclick="event.stopPropagation()">
             <div class="folder-stitching"></div>
@@ -615,9 +607,6 @@
 
             }, 300);
         }
-
-    
-
     </script>
 </body>
 </html>
