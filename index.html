@@ -13,7 +13,7 @@
 
     <div id="inputBlocker"></div>
 
-    <div id="mainVault" class="w-full max-w-[390px] h-[840px] bg-white rounded-[3.5rem] shadow-2xl border border-slate-100 relative flex flex-col overflow-hidden">
+    <div id="mainVault" class="w-full max-w-[390px] h-[920px] bg-white rounded-[3.5rem] shadow-2xl border border-slate-100 relative flex flex-col overflow-hidden">
         
         <div id="siren" class="siren-unit">
             <div class="siren-frame">
@@ -107,12 +107,29 @@
 
         <!-- ===== FLOATING DRAWER LAYER ===== -->
         <div class="drawer-area">
-            <div class="drawer-housing">
+            <div class="drawer-housing z-50">
                 <div class="drawer-body" onclick="this.classList.toggle('open')"></div>
                 <button onclick="toggleVault()" class="access-btn">
                     <div class="btn-led"></div><span>Access Vault</span>
                 </button>
             </div>
+            <div class="drawer-housing">
+                <div class="drawer-body" onclick="this.classList.toggle('open')"></div>
+                    <div class="gamepad-container">
+                        <div class="gamepad-body">
+                            <div class="dpad">
+                                <div class="dpad-btn v"></div>
+                                <div class="dpad-btn h"></div>
+                            </div>
+                            <div class="action-btns">
+                                <div class="g-btn"></div>
+                                <div class="g-btn"></div>
+                                <div class="g-btn"></div>
+                                <div class="g-btn"></div>
+                            </div>
+                        </div>
+                    </div>
+            </div> 
         </div>
 
     </div>
